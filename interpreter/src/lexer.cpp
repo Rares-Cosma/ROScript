@@ -2,7 +2,7 @@
  * @file lexer.cpp
  * @brief Lexer implementation for the Roscript interpreter.
  * This file contains the implementation of the lexer for the Roscript interpreter. It contains functions to tokenize the input source code, identifing keywords, operators, literals, and handling string literals with escape sequences.
- * It's header contains the lexer function and the Type class for type checking.
+ * It's header contains the lexer function.
  * @see lexer.h
  * 
  * @author Rares-Cosma & Vlad-Oprea

@@ -1,3 +1,11 @@
+/**
+ * @file parser.h
+ * @brief Header file for the parser component of the Roscript interpreter.
+ * This file contains the declaration of the AST nodes and the parser functions.
+ * @author Rares-Cosma & Vlad-Oprea
+ * @date 2025-06-24
+ */
+
 #pragma once
 #include "stdlib.cpp"
 #include <vector>
@@ -8,6 +16,11 @@ inline vector<string> arithmetic_operators = {"+", "-", "*", "/", "%"};
 inline vector<string> comparison_operators = {"==", "!=", "<", ">", "<=", ">="};
 
 inline string variant_to_string(const Value& v) {
+	/**
+	 * @brief Converts a Value variant to a string representation.
+	 * @param v The Value variant to convert.
+	 * @return A string representation of the Value.
+	 */
     if (holds_alternative<int>(v)) return to_string(get<int>(v));
     if (holds_alternative<float>(v)) return to_string(get<float>(v));
     if (holds_alternative<string>(v)) return get<string>(v);
@@ -15,6 +28,11 @@ inline string variant_to_string(const Value& v) {
     return "NDT"; // handle cases where the type is unsupported
 }
 
+/**
+ * @class ASTNode
+ * @brief Abstract base class for all AST nodes.
+ * @note This class defines the interface for all AST nodes, including a virtual destructor and a pure virtual function for evaluation.
+ */
 class ASTNode {
 	public:
 		virtual ~ASTNode() = default;
@@ -22,6 +40,11 @@ class ASTNode {
 		virtual Value eval() {}; // pure virtual function for evaluation
 };
 
+/**
+ * @class Expr
+ * @brief Abstract base class for all expressions in the AST.
+ * @note This class inherits from ASTNode and defines the interface for expressions, including a pure virtual function for evaluation and a pure virtual function for printing.
+ */
 class Expr: public ASTNode {
 	public:
 		Value eval() override { cout<<"Base Expression"; }; // pure virtual function for evaluation
@@ -32,6 +55,11 @@ class Expr: public ASTNode {
 
 // STATEMENTS
 
+/**
+ * @class PrintStatement
+ * @brief Represents a print statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression to be printed.
+ */
 class PrintStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -47,8 +75,13 @@ class PrintStatement : public ASTNode {
 		~PrintStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+ * @class AssignStatement
+ * @brief Represents an assignment statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression and a variable name for the assignment.
+ */
 class AssignStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -66,8 +99,14 @@ class AssignStatement : public ASTNode {
 		~AssignStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+ * @class IfStatement
+ * @brief Represents an if statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression for the condition, a block of statements for the if branch, optional else-if branches, and an optional else block.
+ * @details The else-if branches are stored as pairs of expressions and blocks, allowing for multiple conditions to be checked sequentially.
+ */
 class IfStatement : public ASTNode {
 public:
     Expr* expr;
@@ -124,6 +163,11 @@ public:
     }
 };
 
+/**
+ * @class WhileStatement
+ * @brief Represents a while statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression for the condition and a block of statements to be executed while the condition is true.
+ */
 class WhileStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -143,8 +187,13 @@ class WhileStatement : public ASTNode {
 		~WhileStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+ * @class DoWhileStatement
+ * @brief Represents a do-while statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression for the condition and a block of statements to be executed at least once before checking the condition.
+ */
 class DoWhileStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -164,8 +213,13 @@ class DoWhileStatement : public ASTNode {
 		~DoWhileStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+ * @class DoUntilStatement
+ * @brief Represents a do-until statement in the AST.
+ * @note This class inherits from ASTNode and contains an expression for the condition and a block of statements to be executed at least once before checking if the condition is false.
+ */
 class DoUntilStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -185,8 +239,13 @@ class DoUntilStatement : public ASTNode {
 		~DoUntilStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+* @class ForStatement
+* @brief Represents a for statement in the AST.
+* @note This class inherits from ASTNode and contains an initialization block, an expression for the condition, a block of statements to be executed, and an assignment block for the increment/decrement operation.
+*/
 class ForStatement : public ASTNode {
 	public:
 		Expr* expr;
@@ -207,8 +266,13 @@ class ForStatement : public ASTNode {
 		~ForStatement() {
 			delete expr;
 		}
-	};
+};
 
+/**
+ * @class InputStatement
+ * @brief Represents an input statement in the AST.
+ * @note This class inherits from ASTNode and contains a string representing the variable name to which the input will be assigned.
+ */
 class InputStatement : public ASTNode {
 	public:
 		string name;
@@ -220,8 +284,14 @@ class InputStatement : public ASTNode {
 			cout<<name;
 			cout << endl;
 		}
-	};
+};
 
+/**
+ * @class VariableDeclaration
+ * @brief Represents a variable declaration in the AST.
+ * @note This class inherits from ASTNode and contains a string for the variable name, a string for the type, and an optional expression for the initial value.
+ * @details If no initial value is provided, it defaults to a "No Default Type" (NDT) value.
+ */
 class VariableDeclaration : public ASTNode {
 	public:
 		string name, type;
@@ -243,10 +313,14 @@ class VariableDeclaration : public ASTNode {
 		~VariableDeclaration() {
 			delete value;
 		}
-	};
+};
 
 // LITERALS
 
+/**
+ * @class IntLiteral
+ * @brief Represents an integer literal in the AST, derrived from Expr.
+ */
 class IntLiteral : public Expr {
     int value;
 	public:
@@ -261,6 +335,10 @@ class IntLiteral : public Expr {
 	}
 };
 
+/**
+ * @class BoolLiteral
+ * @brief Represents a boolean literal in the AST, derrived from Expr.
+ */
 class BoolLiteral : public Expr {
     bool value;
 	public:
@@ -275,6 +353,10 @@ class BoolLiteral : public Expr {
 	}
 };
 
+/**
+ * @class FloatLiteral
+ * @brief Represents a float literal in the AST, derrived from Expr.
+ */
 class FloatLiteral : public Expr {
     float value;
 	public:
@@ -289,6 +371,10 @@ class FloatLiteral : public Expr {
 	}
 };
 
+/**
+ * @class StringLiteral
+ * @brief Represents a string literal in the AST, derrived from Expr.
+ */
 class StringLiteral : public Expr {
     string value;
 	public:
@@ -303,6 +389,12 @@ class StringLiteral : public Expr {
 	}
 };
 
+/**
+ * @class Refrence
+ * @brief Represents a variable reference in the AST, derrived from Expr.
+ * @note This class allows access to variables defined in the global scope.
+ * @details It retrieves the value of a variable from the global `variables` map.
+ */
 class Refrence : public Expr {
     string name;
 	public:
@@ -317,6 +409,11 @@ class Refrence : public Expr {
 	}
 };
 
+/**
+ * @brief Calls a function from the standard library or user-defined functions.
+ * @param name The name of the function to call.
+ * @param args The arguments to pass to the function.
+ */
 inline Value callFunction(const string& name, const vector<Value>& args){
 	auto it = stdlib.find(name);
     if (it == stdlib.end()) {
@@ -326,6 +423,11 @@ inline Value callFunction(const string& name, const vector<Value>& args){
 	return it->second(args);
 }
 
+/**
+ * @class FunctionCall
+ * @brief Represents a function call in the AST, derrived from Expr.
+ * @note This class allows calling functions defined in the standard library or user-defined functions.
+ */
 class FunctionCall : public Expr {
 	public:
 	string name;
@@ -351,6 +453,12 @@ class FunctionCall : public Expr {
 	}
 };
 
+/**
+ * @class BinaryExpr
+ * @brief Represents a binary expression in the AST, derrived from Expr.
+ * @note This class handles binary operations between two expressions, such as arithmetic and comparison operations.
+ * @details It evaluates the left and right expressions based on the operator provided.
+ */
 class BinaryExpr : public Expr {
 	public:
 	Expr* left;

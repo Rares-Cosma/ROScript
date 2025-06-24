@@ -1,3 +1,12 @@
+/**
+ * @file stdlib.cpp
+ * @brief Standard library functions for the Roscript interpreter.
+ * This file contains the implementation of built-in functions such as type conversion and string manipulation.
+ * 
+ * @author Rares-Cosma & Vlad-Oprea
+ * @date 2025-06-23
+ */
+
 #include "variables.h"
 #include <functional>
 #include <cmath>
